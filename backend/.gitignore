@@ -1,0 +1,12 @@
+.venv/
+*.pyc
+__pycache__/
+*.sqlite3
+.env
+htmlcov/
+.pytest_cache/
+staticfiles/
+.pytest_cache/
+test_student.json
+.coverage
+reports/

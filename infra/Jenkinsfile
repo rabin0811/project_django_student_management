@@ -1,0 +1,57 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Lint') {
+            steps {
+                sh '''
+                    python -m pip install flake8 --quiet
+                    flake8 . --exclude=.venv,__pycache__,migrations --max-line-length=120
+                '''
+            }
+            post {
+                failure {
+                    sh 'echo "Lint failed. Fix the issues above."'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh '''
+                    python -m pip install -r requirements.txt --quiet
+                    python -m pytest --tb=short --junitxml=reports/junit.xml --cov=students --cov-report=term --cov-report=xml:reports/coverage.xml
+                '''
+            }
+            post {
+                always {
+                    junit 'reports/junit.xml'
+                    cobertura coberturaReportFile: 'reports/coverage.xml'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh '''
+                    docker build -t student-management-system .
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check the logs for details.'
+        }
+    }
+}

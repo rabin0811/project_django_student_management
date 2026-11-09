@@ -1,0 +1,30 @@
+{% extends 'students/base.html' %}
+
+{% block title %}{{ student.name }}{% endblock %}
+
+{% block content %}
+<h1>{{ student.name }}</h1>
+
+<div class="card mt-3">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">ID</dt>
+            <dd class="col-sm-9">{{ student.id }}</dd>
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">{{ student.email }}</dd>
+            <dt class="col-sm-3">Age</dt>
+            <dd class="col-sm-9">{{ student.age }}</dd>
+            <dt class="col-sm-3">Course</dt>
+            <dd class="col-sm-9">{{ student.get_course_display }}</dd>
+            <dt class="col-sm-3">Enrolled</dt>
+            <dd class="col-sm-9">{{ student.enrollment_date|date:"Y-m-d" }}</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{% url 'students:update' student.pk %}" class="btn btn-warning">Edit</a>
+    <a href="{% url 'students:delete' student.pk %}" class="btn btn-danger">Delete</a>
+    <a href="{% url 'students:list' %}" class="btn btn-secondary">Back to List</a>
+</div>
+{% endblock %}

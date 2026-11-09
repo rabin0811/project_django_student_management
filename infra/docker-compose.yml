@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: studentmgmt-db
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: studentmgmt
+      POSTGRES_USER: studentuser
+      POSTGRES_PASSWORD: studentpass
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U studentuser -d studentmgmt"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build: .
+    container_name: studentmgmt-web
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DB_ENGINE: django.db.backends.postgresql
+      DB_NAME: studentmgmt
+      DB_USER: studentuser
+      DB_PASSWORD: studentpass
+      DB_HOST: db
+      DB_PORT: "5432"
+      SECRET_KEY: django-insecure-e!a%^betp!+-y+)cr+s!vz!fus6b^e^94!54(2ooh=z(gwpy80
+      DEBUG: "True"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
